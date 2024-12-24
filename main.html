@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body style="background-color: grey;">
+    <script src="main.js"></script>
+
+
+    <input type="file" id="filePicker" onchange="loadFile()">
+
+
+    <input type="text" id="currTime" onchange="draw()" value="0">
+    <button onclick="play()">Next</button>
+    <button onclick="if (!isPlaying) {isPlaying=true; play()}">Play</button>
+    <button onclick="isPlaying=false;">Stop</button>
+    <button onclick="currFrame=parseInt(document.getElementById('currTime').value);draw()">Jump</button>
+
+</body>
+
+</html>
