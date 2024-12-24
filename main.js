@@ -65,8 +65,8 @@ async function loadSVG(uri, id, width, height) {
     svg_defs.appendChild(patchSVG);
 }
 
-loadSVG('/surface_code_double.svg', 'surface_code_double', 2, 1);
-loadSVG('/surface_code.svg', 'surface_code', 1, 1);
+loadSVG('surface_code_double.svg', 'surface_code_double', 2, 1);
+loadSVG('surface_code.svg', 'surface_code', 1, 1);
 
 
 // Drawing functions
@@ -244,7 +244,7 @@ function play() {
 }
 
 
-fetch('/test_input3.json').then(
+fetch('test_input3.json').then(
     (resp) => resp.json()
 ).then(
     (json) => {data = json;drawDataBackground();}
