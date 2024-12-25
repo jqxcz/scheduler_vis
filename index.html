@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <title>T-Scheduler Visualiser</title>
     <link href="bootstrap.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="surface_code.svg">
 </head>
 
 <body class="container">
-    <header class="navbar sticky-top">
+    <header class="navbar sticky-top bg-body">
         <nav class="container bd-gutter flex-wrap flex-lg-nowrap">
             <div class="col"></div>
-            <label class="col-sm-1 col-form-label">Page theme: </label>
+            <label class="col-xl-1 col-form-label">Page theme: </label>
             <div class="col-auto">
                 <div class="btn-group">
                     <button class="btn btn-light" id='lightBtn' onclick="setLightDarkMode('light')">Light</button>
@@ -24,9 +25,9 @@
     <div class="container align-items-center p-1 text-center bg-secondary rounded h-100" id="mainContainer">
         <!-- SVG injected here -->
     </div>
-    <div class="container align-items-center fixed-bottom">
+    <div class="container align-items-center sticky-bottom bg-body">
 
-        <div class="row d-flex justify-content-center my-3">
+        <div class="row d-flex justify-content-center py-3">
             <div class="col-3">
                 <input class="form-control" type="file" id="filePicker" onchange="loadFile()">
             </div>
@@ -48,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <div class="row d-flex justify-content-center mb-3">
+        <div class="row d-flex justify-content-center pb-2">
             <input type="range" id="frameSelector" oninput="rangeUpdate()" onchange="rangeDone()" min="0" step="1"
                 list="tickmarks" value="0">
             <datalist id="tickmarks"

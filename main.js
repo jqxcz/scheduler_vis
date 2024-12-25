@@ -43,7 +43,7 @@ var frameRange = document.getElementById('frameSelector');
 // Setup
 svg.setAttribute('style', "background-color:lightgrey")
 // svg.setAttribute('transform-origin', "0 0")
-// svg.setAttribute('transform', `scale(${GLOBAL_SCALE})`)
+// svg.setAttribute('transform', `scale(1)`)
 // svg.setAttribute('overflow', "hidden")
 
 
