@@ -1,7 +1,7 @@
 
 // Constants
 const CELL_SIZE = 100;
-const GLOBAL_SCALE = 0.4;
+const GLOBAL_SCALE = 0.40;
 const FRAMERATE = 4;
 const colormap = {
     "SingleRowRegisterRegion": "red",
@@ -295,9 +295,12 @@ function play() {
     }
 }
 
+function setLightDarkMode(mode) {
+    document.querySelector('html').setAttribute('data-bs-theme',mode);
+}
 
 fetch('test_input3.json').then(
     (resp) => resp.json()
 ).then(
-    (json) => {data = json;drawDataBackground();}
+    (json) => {data = json;drawDataBackground(); draw();}
 );

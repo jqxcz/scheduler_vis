@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light">
+<html data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -8,37 +8,55 @@
 </head>
 
 <body class="container">
-    <div class="container align-items-center m-3 text-center" id="mainContainer">
+    <header class="navbar sticky-top">
+        <nav class="container bd-gutter flex-wrap flex-lg-nowrap">
+            <div class="col"></div>
+            <label class="col-sm-1 col-form-label">Page theme: </label>
+            <div class="col-auto">
+                <div class="btn-group">
+                    <button class="btn btn-light" id='lightBtn' onclick="setLightDarkMode('light')">Light</button>
+                    <button class="btn btn-dark" id='darkBtn' onclick="setLightDarkMode('dark')">Dark</button>
+                </div>
+            </div>
+        </nav>
+    </header>
 
+    <div class="container align-items-center p-1 text-center bg-secondary rounded h-100" id="mainContainer">
+        <!-- SVG injected here -->
     </div>
+    <div class="container align-items-center fixed-bottom">
 
-    <div class="row d-flex justify-content-center my-3">
-        <div class="col-3">
-            <input class="form-control" type="file" id="filePicker" onchange="loadFile()">
-        </div>
-        <div class="col-3">
-            <div class="input-group">
-                <label for="currTime" class="input-group-text">Current frame:</label>
-                <input class="form-control" type="text" id="currTime" onchange="boxUpdate()" value="0">
+        <div class="row d-flex justify-content-center my-3">
+            <div class="col-3">
+                <input class="form-control" type="file" id="filePicker" onchange="loadFile()">
+            </div>
+            <div class="col-3">
+                <div class="input-group">
+                    <label for="currTime" class="input-group-text">Current cycle:</label>
+                    <input class="form-control" type="text" id="currTime" onchange="boxUpdate()" value="0">
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary"
+                        onclick="currFrame = Math.max(0, currFrame - 1); draw()">Prev</button>
+                    <button class="btn btn-outline-primary"
+                        onclick="if (!isPlaying) {isPlaying=true; play()}">Play</button>
+                    <button class="btn btn-outline-primary" onclick="isPlaying=false;">Pause</button>
+                    <button class="btn btn-outline-primary" onclick="play()">Next</button>
+                </div>
             </div>
         </div>
+        <div class="row d-flex justify-content-center mb-3">
+            <input type="range" id="frameSelector" oninput="rangeUpdate()" onchange="rangeDone()" min="0" step="1"
+                list="tickmarks" value="0">
+            <datalist id="tickmarks"
+                style="display: flex; flex-direction: column;justify-content: space-between; writing-mode: vertical-lr;">
+            </datalist>
 
-        <div class="col-3">
-            <div class="input-group">
-                <button class="btn btn-outline-primary" onclick="currFrame = Math.max(0, currFrame - 1); draw()">Prev</button>
-                <button class="btn btn-outline-primary" onclick="if (!isPlaying) {isPlaying=true; play()}">Play</button>
-                <button class="btn btn-outline-primary" onclick="isPlaying=false;">Pause</button>
-                <button class="btn btn-outline-primary" onclick="play()">Next</button>
-            </div>
         </div>
     </div>
-    <div class="row d-flex justify-content-center">
-        <input type="range" id="frameSelector" oninput="rangeUpdate()" onchange="rangeDone()" min="0" step="1" list="tickmarks" value="0" style='width:95vw'>
-        <datalist id="tickmarks" style="display: flex; flex-direction: column;justify-content: space-between; writing-mode: vertical-lr;">
-        </datalist>
-
-    </div>
-
 
     <script src="main.js"></script>
 </body>
