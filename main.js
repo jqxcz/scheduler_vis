@@ -1,7 +1,8 @@
 
 // Constants
 const CELL_SIZE = 100;
-
+const GLOBAL_SCALE = 0.4;
+const FRAMERATE = 4;
 const colormap = {
     "SingleRowRegisterRegion": "red",
     "MagicStateFactoryRegion": "blue",
@@ -27,6 +28,7 @@ const symbolmap = {
 // Global variables
 var data; // Data loaded to render
 var isPlaying = false;
+var savedPlayingState = null;
 var currFrame = 0;
 
 var svgNS = "http://www.w3.org/2000/svg";
@@ -35,19 +37,24 @@ var svg_defs = document.createElementNS(svgNS, "defs");
 var svg_bg = document.createElementNS(svgNS, "g");
 var svg_fg = document.createElementNS(svgNS, "g");
 
-
-
+var frameBox = document.getElementById('currTime');
+var frameRange = document.getElementById('frameSelector');
 
 // Setup
-svg.setAttribute('style', "background-color:white")
-svg.setAttribute('width', '90vw');
-svg.setAttribute('height', '80vh');
+svg.setAttribute('style', "background-color:lightgrey")
+// svg.setAttribute('transform-origin', "0 0")
+// svg.setAttribute('transform', `scale(${GLOBAL_SCALE})`)
+// svg.setAttribute('overflow', "hidden")
+
+
+// svg.setAttribute('width', 'auto');
+// svg.setAttribute('height', '80vh');
 
 svg.appendChild(svg_defs);
 svg.appendChild(svg_bg);
 svg.appendChild(svg_fg);
 
-document.body.appendChild(svg);
+document.getElementById('mainContainer').appendChild(svg);
 
 
 
@@ -205,13 +212,24 @@ function drawLayer(layer) {
 
 function drawDataBackground() {
     var svg_width = (data['width'] + 0.05) * CELL_SIZE;
-    var svg_height = (data['height'] + 0.05) * CELL_SIZE
-    svg.setAttribute('viewBox', `${-0.05 * CELL_SIZE} ${-0.05 * CELL_SIZE} ${svg_width + 0.05 * CELL_SIZE} ${svg_height + 0.05 * CELL_SIZE}`);
+    var svg_height = (data['height'] + 0.05) * CELL_SIZE;
+    const svg_offset = 0.05 * CELL_SIZE;
+    svg.setAttribute('viewBox', `${-svg_offset} ${-svg_offset} ${svg_width + svg_offset} ${svg_height + svg_offset}`);
+    svg.setAttribute('width', svg_width * GLOBAL_SCALE);
+    svg.setAttribute('height', svg_height * GLOBAL_SCALE);
     for (var region of data["regions"]) {
         drawWidgetRegion(region);
     }
     drawBaseLayer(data['width'], data['height']);
 
+    var i;
+    for (i = 0; i < data['layers'].length + 9; i+=10) {
+        var opt = document.createElement('option');
+        opt.setAttribute('value', i);
+        opt.setAttribute('label', i);
+        document.getElementById('tickmarks').appendChild(opt);
+    }
+    frameRange.setAttribute('max', i - 10);
 }
 
 function loadFile() {
@@ -226,20 +244,54 @@ function loadFile() {
     fileread.readAsText(file_to_read);
 }
 
+function rangeUpdate() {
+    if (frameRange.valueAsNumber > data['layers'].length - 1) {
+        frameRange.valueAsNumber = data['layers'].length - 1;
+    }
+    if (frameRange.valueAsNumber != currFrame) {
+        currFrame = frameRange.valueAsNumber;
+        draw();
+        if (savedPlayingState == null) {
+            savedPlayingState = isPlaying;
+            isPlaying = false;
+        }
+    }
+}
+
+function rangeDone() {
+    if (savedPlayingState !== null) {
+        isPlaying = savedPlayingState;
+        savedPlayingState = null;
+        if (isPlaying) {
+            setTimeout(play, 1000 / FRAMERATE);
+        }
+    }
+}
+
+function boxUpdate() {
+    if (frameBox.valueAsNumber > data['layers'].length - 1) {
+        frameBox.value = data['layers'].length - 1;
+    }
+    if (frameBox.valueAsNumber != currFrame) {
+        currFrame = frameBox.valueAsNumber;
+    }
+    draw();
+}
 
 function draw() {
-    currFrame = parseInt(document.getElementById('currTime').value);
     svg_fg.innerHTML = '';
     drawLayer(data['layers'][currFrame]);
+    frameBox.value = currFrame;
+    frameRange.value = currFrame;
 }
 
 
 function play() {
-    document.getElementById('currTime').value = currFrame + 1;
-    if (currFrame >= data['layers'].length - 1) { return; }
+    currFrame = currFrame + 1;
+    if (currFrame > data['layers'].length - 1) { return; }
     draw();
     if (isPlaying) {
-        setTimeout(play, 250);
+        setTimeout(play, 1000/FRAMERATE);
     }
 }
 
