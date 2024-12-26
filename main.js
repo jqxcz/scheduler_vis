@@ -39,7 +39,7 @@ var frameRange = document.getElementById("frameSelector");
 var viewBox = svg.viewBox.baseVal;
 
 // Setup
-svg.setAttribute("style", "background-color:lightgrey");
+svg.setAttribute("style", "background-color:lightgrey; touch-action:none;");
 // svg.setAttribute('transform-origin', "0 0")
 // svg.setAttribute('transform', `scale(1)`)
 // svg.setAttribute('overflow', "hidden")
