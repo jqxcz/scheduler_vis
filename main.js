@@ -36,6 +36,8 @@ var svg_fg = document.createElementNS(svgNS, "g");
 var frameBox = document.getElementById("currTime");
 var frameRange = document.getElementById("frameSelector");
 
+var viewBox = svg.viewBox.baseVal;
+
 // Setup
 svg.setAttribute("style", "background-color:lightgrey");
 // svg.setAttribute('transform-origin', "0 0")
@@ -196,17 +198,20 @@ function drawLayer(layer) {
 }
 
 function drawDataBackground() {
-  const svg_offset = 0.05 * CELL_SIZE;
-  var svg_width = data["width"] * CELL_SIZE + 2 * svg_offset;
-  var svg_height = data["height"] * CELL_SIZE + 2 * svg_offset;
-  svg.setAttribute(
-    "viewBox",
-    `${-svg_offset} ${-svg_offset} ${svg_width} ${svg_height}`
-  );
+  //   const svg_offset = 0.05 * CELL_SIZE;
+  //   var svg_width = data["width"] * CELL_SIZE + 2 * svg_offset;
+  //   var svg_height = data["height"] * CELL_SIZE + 2 * svg_offset;
+  //   svg.setAttribute(
+  //     "viewBox",
+  //     `${-svg_offset} ${-svg_offset} ${svg_width} ${svg_height}`
+  //   );
   // svg.setAttribute('width', svg_width * GLOBAL_SCALE);
   // svg.setAttribute('height', svg_height * GLOBAL_SCALE);
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "720");
+//   try {
+    initialiseViewPort();
+//   } catch (e) {}
 
   for (var region of data["regions"]) {
     drawWidgetRegion(region);
@@ -297,11 +302,10 @@ fetch("test_input3.json")
     data = json;
     drawDataBackground();
     draw();
-});
+  });
 
 // Zoom/pan functionality
 
-var viewBox = svg.viewBox.baseVal;
 var isPointerDown = false;
 var pointerOrigin;
 var deltaZoom = 0;
@@ -320,7 +324,38 @@ function getPointFromEvent(event) {
   return point.matrixTransform(invertedSVGMatrix);
 }
 
+async function saveSVG() {
+  const opts = {
+    types: [
+      {
+        description: "SVG file",
+        accept: { "image/svg+xml": [".svg"] },
+      },
+    ],
+  };
+  var svgClone = svg.cloneNode(true);
+  var svgData = new XMLSerializer().serializeToString(svgClone);
+
+  var handler = await window.showSaveFilePicker(opts);
+  var writable = await handler.createWritable();
+  await writable.write(svgData);
+
+  await writable.close();
+}
+
 function initialiseViewPort() {
+  const svg_offset = 0.05 * CELL_SIZE;
+  var svg_width = data["width"] * CELL_SIZE + 2 * svg_offset;
+  var svg_height = data["height"] * CELL_SIZE + 2 * svg_offset;
+  svg.setAttribute(
+    "viewBox",
+    `${-svg_offset} ${-svg_offset} ${svg_width} ${svg_height}`
+  );
+
+  if (viewBox === undefined || viewBox === null) {
+    viewBox = svg.viewBox.baseVal;
+  }
+
   var invertedSVGMatrix = svg.getScreenCTM().inverse();
   var rect = svg.getBoundingClientRect();
   var point = svg.createSVGPoint();
@@ -376,6 +411,6 @@ svg.addEventListener("pointerdown", onPointerDown);
 svg.addEventListener("pointerup", onPointerUp);
 svg.addEventListener("pointerleave", onPointerUp);
 svg.addEventListener("pointermove", onPointerMove);
-svg.addEventListener("pointerenter", initialiseViewPort, { once: true });
+// svg.addEventListener("pointerenter", initialiseViewPort, { once: true });
 
 svg.addEventListener("wheel", onWheel);
