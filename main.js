@@ -375,6 +375,7 @@ function onPointerDown(event) {
   isPointerDown = true;
   pointerOrigin = getPointFromEvent(event);
   event.preventDefault();
+  svg.setPointerCapture(event.pointerId);
 }
 
 function onPointerMove(event) {
@@ -391,10 +392,11 @@ function onPointerMove(event) {
 function onPointerUp(event) {
   isPointerDown = false;
   event.preventDefault();
+  svg.releasePointerCapture(event.pointerId);
 }
 
 function onWheel(event) {
-  deltaZoom += event.deltaY;
+  deltaZoom += event.deltaY + event.deltaZ;
   var wheelPosition = getPointFromEvent(event);
   function updateViewBoxBounds() {
     var deltaScale = Math.pow(2, deltaZoom / 100);
@@ -405,12 +407,14 @@ function onWheel(event) {
     viewBox.width *= deltaScale;
   }
   requestAnimationFrame(updateViewBoxBounds);
+  event.preventDefault();
 }
 
 svg.addEventListener("pointerdown", onPointerDown);
 svg.addEventListener("pointerup", onPointerUp);
-svg.addEventListener("pointerleave", onPointerUp);
 svg.addEventListener("pointermove", onPointerMove);
-// svg.addEventListener("pointerenter", initialiseViewPort, { once: true });
+
+svg.addEventListener("touchStart", onPointerDown);
+svg.addEventListener("touchEnd", onPointerUp);
 
 svg.addEventListener("wheel", onWheel);
