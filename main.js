@@ -213,6 +213,8 @@ function drawDataBackground() {
   initialiseViewPort();
   //   } catch (e) {}
 
+  svg_bg.innerHTML = '';
+
   for (var region of data["regions"]) {
     drawWidgetRegion(region);
   }
