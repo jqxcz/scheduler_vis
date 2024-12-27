@@ -209,9 +209,9 @@ function drawDataBackground() {
   // svg.setAttribute('height', svg_height * GLOBAL_SCALE);
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "720");
-//   try {
-    initialiseViewPort();
-//   } catch (e) {}
+  //   try {
+  initialiseViewPort();
+  //   } catch (e) {}
 
   for (var region of data["regions"]) {
     drawWidgetRegion(region);
@@ -324,7 +324,7 @@ function getPointFromEvent(event) {
   return point.matrixTransform(invertedSVGMatrix);
 }
 
-async function saveSVG() {
+async function saveSVG(animated) {
   const opts = {
     types: [
       {
@@ -334,6 +334,32 @@ async function saveSVG() {
     ],
   };
   var svgClone = svg.cloneNode(true);
+  if (animated) {
+    svgClone.removeChild(svgClone.lastChild);
+    for (var i = 0; i < data["layers"].length; i++) {
+      svg_fg = document.createElementNS(svgNS, "g");
+      svg_fg.setAttribute("visibility", "hidden");
+
+      var anim = document.createElementNS(svgNS, "set");
+      anim.setAttribute("id", "frame" + i);
+      anim.setAttribute("attributeName", "visibility");
+      anim.setAttribute("to", "visible");
+      if (i == 0) {
+        anim.setAttribute("begin", `0; frame${data["layers"].length - 1}.end`);
+      } else {
+        anim.setAttribute("begin", `frame${i - 1}.end`);
+      }
+      anim.setAttribute("dur", 1 / FRAMERATE + "s");
+
+      svg_fg.appendChild(anim);
+
+      drawLayer(data["layers"][i]);
+      svgClone.appendChild(svg_fg);
+    }
+
+    svg_fg = svg.lastChild;
+    draw();
+  }
   var svgData = new XMLSerializer().serializeToString(svgClone);
 
   var handler = await window.showSaveFilePicker(opts);

@@ -44,7 +44,7 @@
       id="controlContainer"
     >
       <div class="row d-flex justify-content-center py-3">
-        <div class="col-3">
+        <div class="col-2">
           <input
             class="form-control"
             type="file"
@@ -52,7 +52,7 @@
             onchange="loadFile()"
           />
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <div class="input-group">
             <label for="currTime" class="input-group-text"
               >Current cycle:</label
@@ -98,8 +98,11 @@
           </button>
         </div>
         <div class="col-auto">
-          <button class="btn btn-outline-primary" onclick="saveSVG()">
+          <button class="btn btn-outline-primary" onclick="saveSVG(false)">
             Save
+          </button>
+          <button class="btn btn-outline-primary" onclick="saveSVG(true)">
+            Save (animated)
           </button>
         </div>
       </div>
