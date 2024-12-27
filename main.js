@@ -2,6 +2,22 @@
 const CELL_SIZE = 100;
 const GLOBAL_SCALE = 0.4;
 const FRAMERATE = 4;
+
+const prerendered_patches = [
+  {
+    file: "surface_code_double.svg",
+    id: "surface_code_double",
+    width: 2,
+    height: 1,
+  },
+  {
+    file: "surface_code.svg",
+    id: "surface_code",
+    width: 1,
+    height: 1,
+  },
+];
+
 const colormap = {
   SingleRowRegisterRegion: "red",
   MagicStateFactoryRegion: "blue",
@@ -9,16 +25,16 @@ const colormap = {
 };
 
 const symbolmap = {
-  bell: "$",
-  locked: "🔒",
-  reg: "R",
-  route: "=",
-  magic_state: "✨",
-  cultivator: "@",
-  reserved: "X",
-  factory_output: "@",
-  route_buffer: ".",
-  other: "?",
+  bell: { text: "🔔" },
+  locked: { text: "🔒" },
+  reg: { patch: "surface_code" },
+  route: { text: "=" },
+  magic_state: { text: "✨" },
+  cultivator: { text: "🌻" },
+  reserved: { text: "⛔" },
+  factory_output: { text: "@" },
+  route_buffer: { text: "." },
+  other: { text: "?" },
 };
 
 // Global variables
@@ -40,12 +56,6 @@ var viewBox = svg.viewBox.baseVal;
 
 // Setup
 svg.setAttribute("style", "background-color:lightgrey; touch-action:none;");
-// svg.setAttribute('transform-origin', "0 0")
-// svg.setAttribute('transform', `scale(1)`)
-// svg.setAttribute('overflow', "hidden")
-
-// svg.setAttribute('width', '100%');
-// svg.setAttribute('height', '80vh');
 
 svg.appendChild(svg_defs);
 svg.appendChild(svg_bg);
@@ -67,8 +77,9 @@ async function loadSVG(uri, id, width, height) {
   svg_defs.appendChild(patchSVG);
 }
 
-loadSVG("surface_code_double.svg", "surface_code_double", 2, 1);
-loadSVG("surface_code.svg", "surface_code", 1, 1);
+for (var patch of prerendered_patches) {
+  loadSVG(patch.file, patch.id, patch.width, patch.height);
+}
 
 // Drawing functions
 function roundedRect(x, y, width, height, radius, fill, fill_opacity) {
@@ -144,25 +155,27 @@ function drawBaseLayer(width, height) {
 }
 
 function drawCellContents(rowIdx, colIdx, cell) {
-  if (cell["type"] !== "reg") {
-    var x = colIdx * CELL_SIZE + CELL_SIZE * 0.2;
-    var y = rowIdx * CELL_SIZE + CELL_SIZE * 0.7;
-    var text = document.createElementNS(svgNS, "text");
-    text.setAttribute("font-size", CELL_SIZE * 0.5);
-    text.setAttribute("x", x);
-    text.setAttribute("y", y);
-    text.innerHTML = symbolmap[cell["type"]];
-    if (text.innerHTML == "undefined") {
-      console.log(cell);
-    }
-    svg_fg.appendChild(text);
-  } else {
+  if ("patch" in symbolmap[cell.type]) {
     var x = colIdx * CELL_SIZE;
     var y = rowIdx * CELL_SIZE;
     var text = document.createElementNS(svgNS, "use");
-    text.setAttribute("href", "#surface_code");
+    text.setAttribute("href", `#${symbolmap[cell.type].patch}`);
     text.setAttribute("x", x);
     text.setAttribute("y", y);
+    svg_fg.appendChild(text);
+  } else {
+    var x = colIdx * CELL_SIZE + CELL_SIZE * 0.5;
+    var y = rowIdx * CELL_SIZE + CELL_SIZE * 0.55;
+    var text = document.createElementNS(svgNS, "text");
+    text.setAttribute("font-size", CELL_SIZE * 0.5);
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("x", x);
+    text.setAttribute("y", y);
+    text.innerHTML = symbolmap[cell["type"]].text;
+    if (text.innerHTML == "undefined") {
+      console.log(cell);
+    }
     svg_fg.appendChild(text);
   }
 }
@@ -198,27 +211,19 @@ function drawLayer(layer) {
 }
 
 function drawDataBackground() {
-  //   const svg_offset = 0.05 * CELL_SIZE;
-  //   var svg_width = data["width"] * CELL_SIZE + 2 * svg_offset;
-  //   var svg_height = data["height"] * CELL_SIZE + 2 * svg_offset;
-  //   svg.setAttribute(
-  //     "viewBox",
-  //     `${-svg_offset} ${-svg_offset} ${svg_width} ${svg_height}`
-  //   );
-  // svg.setAttribute('width', svg_width * GLOBAL_SCALE);
-  // svg.setAttribute('height', svg_height * GLOBAL_SCALE);
   svg.setAttribute("width", "100%");
   svg.setAttribute("height", "720");
-  //   try {
-  initialiseViewPort();
-  //   } catch (e) {}
 
-  svg_bg.innerHTML = '';
+  initialiseViewPort();
+
+  svg_bg.innerHTML = "";
 
   for (var region of data["regions"]) {
     drawWidgetRegion(region);
   }
   drawBaseLayer(data["width"], data["height"]);
+
+  document.getElementById("tickmarks").innerHTML = "";
 
   var i;
   for (i = 0; i < data["layers"].length + 9; i += 10) {
@@ -238,6 +243,7 @@ function loadFile() {
     var intern = JSON.parse(content);
     data = intern;
     drawDataBackground();
+    draw();
   };
   fileread.readAsText(file_to_read);
 }
