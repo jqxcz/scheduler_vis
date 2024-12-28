@@ -181,7 +181,7 @@ function drawCellContents(rowIdx, colIdx, cell) {
 }
 
 function drawRoute(p1, p2) {
-  if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1]) > 1) {
+  if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1]) != 1) {
     return;
   }
   var x = Math.min(p1[1], p2[1]) * CELL_SIZE + CELL_SIZE * 0.2;
