@@ -452,3 +452,10 @@ svg.addEventListener("touchStart", onPointerDown);
 svg.addEventListener("touchEnd", onPointerUp);
 
 svg.addEventListener("wheel", onWheel);
+
+
+window.addEventListener("message", (event) => {
+  data = event.data;
+  drawDataBackground();
+  draw();
+})
