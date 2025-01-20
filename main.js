@@ -31,22 +31,26 @@ const prerendered_patches = [
 ];
 
 const colormap = {
-  SingleRowRegisterRegion: "red",
+  SingleRowRegisterRegion: "yellow",
+  CombShapedRegisterRegion: "yellow",
   MagicStateFactoryRegion: "blue",
+  TCultivatorBufferRegion: "blue",
+  MagicStateBufferRegion: "red",
+  BellRegion: "magenta",
   RouteBus: "green",
 };
 
 const symbolmap = {
   bell: { patch: "bell_state" },
-  locked: { text: "🔒" },
+  locked: { text: " " },
   reg: { patch: "surface_code" },
-  route: { text: "=" },
+  route: { text: " " },
   magic_state: { patch: "magic_state" },
   cultivator: { text: "🌻" },
   reserved: { text: "🚫" },
-  unused: { text: "✖"}, 
-  factory_output: { text: "@" },
-  route_buffer: { text: "." },
+  unused: { text: " "}, 
+  factory_output: { text: " " },
+  route_buffer: { text: " " },
   other: { text: "?" },
 };
 
@@ -117,7 +121,7 @@ function pathRect(x, y, width, height) {
   rect.setAttribute("width", width);
   rect.setAttribute("height", height);
   rect.setAttribute("fill", "orange");
-  rect.setAttribute("fill-opacity", 0.3);
+  rect.setAttribute("fill-opacity", 0.6);
   rect.setAttribute("rx", 1);
   rect.setAttribute("ry", 1);
   return rect;
@@ -141,7 +145,7 @@ function drawWidgetRegion(region) {
   var height = (region["loc_br"][0] - region["loc_tl"][0] + 1) * CELL_SIZE;
 
   svg_bg.appendChild(
-    roundedRect(x, y, width, height, 3, colormap[region["name"]], "10%")
+    roundedRect(x, y, width, height, 3, colormap[region["name"]], "20%")
   );
 
   if ("factories" in region) {
@@ -163,6 +167,9 @@ function drawBaseLayer(width, height) {
   for (var rowIdx = 0; rowIdx < height; rowIdx++) {
     for (var colIdx = 0; colIdx < width; colIdx++) {
       svg_bg.appendChild(baseCell(rowIdx, colIdx));
+      if (data.base_layer.board[rowIdx][colIdx].type == 'reg') {
+        drawCellContents(rowIdx, colIdx, data.base_layer.board[rowIdx][colIdx]);
+      }
     }
   }
 }
@@ -193,19 +200,31 @@ function drawCellContents(rowIdx, colIdx, cell) {
   }
 }
 
+function drawLock(p) {
+  var x = p[1] * CELL_SIZE + CELL_SIZE * 0.2;
+  var y = p[0] * CELL_SIZE + CELL_SIZE * 0.2;
+  var width = CELL_SIZE * 0.6;
+  var height = CELL_SIZE * 0.6
+  svg_fg.appendChild(pathRect(x, y, width, height));
+}
+
 function drawRoute(p1, p2) {
+  drawLock(p2);
   if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1]) != 1) {
     return;
   }
-  var x = Math.min(p1[1], p2[1]) * CELL_SIZE + CELL_SIZE * 0.2;
-  var y = Math.min(p1[0], p2[0]) * CELL_SIZE + CELL_SIZE * 0.2;
+  var x, y;
   var width, height;
   if (p1[0] == p2[0]) {
-    width = CELL_SIZE * 1.6;
+    x = Math.min(p1[1], p2[1]) * CELL_SIZE + CELL_SIZE * 0.8;
+    y = Math.min(p1[0], p2[0]) * CELL_SIZE + CELL_SIZE * 0.2;
+    width = CELL_SIZE * 0.4;
     height = CELL_SIZE * 0.6;
   } else {
+    x = Math.min(p1[1], p2[1]) * CELL_SIZE + CELL_SIZE * 0.2;
+    y = Math.min(p1[0], p2[0]) * CELL_SIZE + CELL_SIZE * 0.8;
     width = CELL_SIZE * 0.6;
-    height = CELL_SIZE * 1.6;
+    height = CELL_SIZE * 0.4;
   }
   svg_fg.appendChild(pathRect(x, y, width, height));
 }
@@ -217,6 +236,9 @@ function drawLayer(layer) {
     }
   }
   for (var gate of layer["gates"]) {
+    if (gate.holds.length > 0) {
+      drawLock(gate.holds[0]);
+    }
     for (var i = 0; i < gate["holds"].length - 1; i++) {
       drawRoute(gate["holds"][i], gate["holds"][i + 1]);
     }
@@ -319,9 +341,10 @@ function setLightDarkMode(mode) {
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
+
 var default_file;
 if (!urlParams.has('file')) {
-  default_file = 'test_input3.json';
+  default_file = 'example.json';
 }
 else {
   default_file = urlParams.get('file');
