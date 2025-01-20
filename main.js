@@ -349,13 +349,15 @@ if (!urlParams.has('file')) {
 else {
   default_file = urlParams.get('file');
 }
-fetch(default_file)
-  .then((resp) => resp.json())
-  .then((json) => {
-    data = json;
-    drawDataBackground();
-    draw();
-  });
+if (default_file !== "none") {
+  fetch(default_file)
+    .then((resp) => resp.json())
+    .then((json) => {
+      data = json;
+      drawDataBackground();
+      draw();
+    });
+}
 
 // Zoom/pan functionality
 
