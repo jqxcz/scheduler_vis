@@ -16,6 +16,18 @@ const prerendered_patches = [
     width: 1,
     height: 1,
   },
+  {
+    file: "magic_state.svg",
+    id: "magic_state",
+    width: 1,
+    height: 1,
+  },
+  {
+    file: "bell_state.svg",
+    id: "bell_state",
+    width: 1,
+    height: 1,
+  },
 ];
 
 const colormap = {
@@ -25,11 +37,11 @@ const colormap = {
 };
 
 const symbolmap = {
-  bell: { text: "🔔" },
+  bell: { patch: "bell_state" },
   locked: { text: "🔒" },
   reg: { patch: "surface_code" },
   route: { text: "=" },
-  magic_state: { text: "✨" },
+  magic_state: { patch: "magic_state" },
   cultivator: { text: "🌻" },
   reserved: { text: "🚫" },
   unused: { text: "✖"}, 
@@ -305,7 +317,16 @@ function setLightDarkMode(mode) {
   document.querySelector("html").setAttribute("data-bs-theme", mode);
 }
 
-fetch("test_input3.json")
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+var default_file;
+if (!urlParams.has('file')) {
+  default_file = 'test_input3.json';
+}
+else {
+  default_file = urlParams.get('file');
+}
+fetch(default_file)
   .then((resp) => resp.json())
   .then((json) => {
     data = json;
