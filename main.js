@@ -201,7 +201,7 @@ function drawCellContents(rowIdx, colIdx, cell) {
 }
 
 function drawLock(p) {
-  if (p == [null, null]) {
+  if (p[0] == null || p[1] == null) {
     return;
   }
   var x = p[1] * CELL_SIZE + CELL_SIZE * 0.2;
@@ -212,7 +212,7 @@ function drawLock(p) {
 }
 
 function drawRoute(p1, p2) {
-  if (p1 == [null, null] || p2 == [null, null]) {
+  if (p1[0] == null || p1[1] == null || p2[0] == null || p2[1] == null) {
     return;
   }
   if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1]) != 1) {
