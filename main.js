@@ -201,6 +201,9 @@ function drawCellContents(rowIdx, colIdx, cell) {
 }
 
 function drawLock(p) {
+  if (p == [null, null]) {
+    return;
+  }
   var x = p[1] * CELL_SIZE + CELL_SIZE * 0.2;
   var y = p[0] * CELL_SIZE + CELL_SIZE * 0.2;
   var width = CELL_SIZE * 0.6;
@@ -209,7 +212,9 @@ function drawLock(p) {
 }
 
 function drawRoute(p1, p2) {
-  drawLock(p2);
+  if (p1 == [null, null] || p2 == [null, null]) {
+    return;
+  }
   if (Math.abs(p1[0] - p2[0]) + Math.abs(p1[1] - p2[1]) != 1) {
     return;
   }
@@ -236,8 +241,8 @@ function drawLayer(layer) {
     }
   }
   for (var gate of layer["gates"]) {
-    if (gate.holds.length > 0) {
-      drawLock(gate.holds[0]);
+    for (const cell of gate["board"]) {
+      drawLock(cell);
     }
     for (var i = 0; i < gate["holds"].length - 1; i++) {
       drawRoute(gate["holds"][i], gate["holds"][i + 1]);
