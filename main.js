@@ -241,7 +241,7 @@ function drawLayer(layer) {
     }
   }
   for (var gate of layer["gates"]) {
-    for (const cell of gate["board"]) {
+    for (const cell of gate["holds"]) {
       drawLock(cell);
     }
     for (var i = 0; i < gate["holds"].length - 1; i++) {
