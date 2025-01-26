@@ -265,14 +265,31 @@ function drawDataBackground() {
 
   document.getElementById("tickmarks").innerHTML = "";
 
+  var increment;
+  if (data["layers"].length < 500) {
+    increment = 10;
+  }
+  else if (data["layers"].length < 1000) {
+    increment = 20;
+  }
+  else if (data["layers"].length < 5000) {
+    increment = 100;
+  }
+  else if (data["layers"].length < 10000) {
+    increment = 200;
+  }
+  else {
+    increment = 1000;
+  }
+
   var i;
-  for (i = 0; i < data["layers"].length + 9; i += 10) {
+  for (i = 0; i < data["layers"].length + increment - 1; i += increment) {
     var opt = document.createElement("option");
     opt.setAttribute("value", i);
     opt.setAttribute("label", i);
     document.getElementById("tickmarks").appendChild(opt);
   }
-  frameRange.setAttribute("max", i - 10);
+  frameRange.setAttribute("max", i - increment);
 }
 
 function loadFile() {
