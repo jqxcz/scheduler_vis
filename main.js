@@ -446,6 +446,27 @@ async function saveSVG(animated) {
   await writable.close();
 }
 
+
+async function saveJSON() {
+  const opts = {
+    types: [
+      {
+        description: "JSON file",
+        accept: { "application/json": [".json"] },
+      },
+    ],
+  };
+  
+  var strData = JSON.stringify(data);
+
+  var handler = await window.showSaveFilePicker(opts);
+  var writable = await handler.createWritable();
+  await writable.write(strData);
+
+  await writable.close();
+}
+
+
 function initialiseViewPort() {
   const svg_offset = 0.05 * CELL_SIZE;
   var svg_width = data["width"] * CELL_SIZE + 2 * svg_offset;
